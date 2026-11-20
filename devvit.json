@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "fish-kingdom",
+  "post": {
+    "dir": "dist/client",
+    "entrypoints": {
+      "default": {
+        "inline": true,
+        "entry": "splash.html"
+      },
+      "game": {
+        "entry": "game.html"
+      }
+    }
+  },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "Create a new post",
+        "description": "fish-kingdom",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create"
+      },
+      {
+        "label": "Example form",
+        "description": "Show a simple form",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/example-form"
+      }
+    ]
+  },
+  "forms": {
+    "exampleForm": "/internal/form/example-submit"
+  },
+  "triggers": {
+    "onAppInstall": "/internal/triggers/on-app-install"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dev": {
+    "subreddit": "fish_kingdom_dev"
+  },
+  "payments": {
+    "productsFile": "./src/products.json",
+    "endpoints": {
+      "fulfillOrder": "/internal/payments/fulfill"
+    }
+  },
+  "permissions": {
+    "reddit": true
+  }
+}

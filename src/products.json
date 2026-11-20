@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developers.reddit.com/schema/products.json",
+  "products": [
+    {
+      "sku": "support-app",
+      "displayName": "Support Fish Kingdom",
+      "description": "A tip to help keep the kingdom growing. Thank you for supporting the game!",
+      "price": 50,
+      "metadata": {
+        "category": "support"
+      },
+      "accountingType": "INSTANT"
+    }
+  ]
+}
