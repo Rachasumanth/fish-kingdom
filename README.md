@@ -1,22 +1,57 @@
 # Fish Kingdom 🐟
 
-A casual arcade game built for Reddit with [Devvit](https://developers.reddit.com/). You start as a tiny guppy and hunt your way up the food chain, clearing stages to climb a community leaderboard and earn subreddit flair.
+Fish Kingdom is a free arcade game for Reddit. You play a small fish in a pond, eat enough prey to grow and evolve, and clear stages to climb a leaderboard in the community where the game is installed. Progress is saved to your Reddit account, and reaching milestones earns you a subreddit flair.
 
-- **Play:** the app creates a post in the subreddit. The post banner runs the live game; tapping anywhere opens the full-screen version.
-- **Terms & Conditions:** [TERMS.md](./TERMS.md)
-- **License:** [MIT](./LICENSE)
+It is built for casual players who want a short, replayable game inside Reddit, and for moderators who want an engaging app for their community.
 
-## Features
+## What the app does
 
-- **Playable in the feed and full screen.** The inline post renders the live game (no static splash image), and a tap anywhere opens the expanded game.
-- **Responsive layout.** The pond adapts to any screen size, including phone portrait, phone landscape, and desktop, with safe-area handling for notches and rounded corners.
-- **Community leaderboard.** Top 5 on desktop, top 3 plus your own row on mobile. Scores are shown with a diamond icon. On desktop the score bar and leaderboard sit in the top-left corner; on mobile they are centered at the top with the pond below.
-- **Server-verified progress.** The client never sends a stage number. Each real stage clear calls `POST /api/stage-cleared`, and the server adds exactly `+1` and records the timestamp. Clears that arrive less than 10 seconds after the previous one are rejected, and progress is capped at stage 10,000.
-- **Flair rewards.** Reaching stage 5 awards the "Pond Hunter" flair and stage 10 awards "Reef Champion". Each tier is granted once and stored in Redis. Flair failures are logged and never block progress.
-- **Share your rank.** The leaderboard has a share button that opens Reddit's share sheet with your current rank.
-- **Support the app.** An optional tip jar uses Reddit's payments platform (`support-app` product), fulfilled by `/internal/payments/fulfill`.
-- **Push notifications (opt-in).** Players can opt in or out of push notifications; the toggle is backed by `@devvit/notifications`.
-- **Automatic post on install.** Installing the app creates a game post in the subreddit.
+- **A playable game inside Reddit.** The app creates a post in your subreddit. The post shows the live game, and tapping it opens a full-screen version.
+- **Grow and evolve.** Move your fish with a swipe or the arrow keys, eat prey to fill the evolution bar, and avoid predators. Clearing a stage moves you to the next one with a new species and three stars.
+- **Community leaderboard.** The top players in the subreddit are listed under the score bar. On desktop you see the top 5; on mobile you see the top 3 plus your own row. Only logged-in Reddit users are ranked.
+- **Flair rewards.** Reaching stage 5 earns "Pond Hunter" flair and stage 10 earns "Reef Champion" flair in the subreddit.
+- **Share your rank.** A share button in the leaderboard opens Reddit's share sheet with your current rank.
+- **Optional support.** A tip jar lets players support the app through Reddit's payments system. It gives no gameplay advantage.
+- **Optional notifications.** Players can opt in to push notifications, and turn them off again at any time.
+
+## Who it is for
+
+- **Players** who want a quick, replayable arcade game in their Reddit feed.
+- **Moderators** who want to add a game to their community. Installing the app creates a game post automatically.
+
+## How players use it
+
+1. Open the game post in the subreddit.
+2. Tap the banner to open the full-screen game.
+3. Swipe (mobile) or use the arrow keys (desktop) to move. Eat smaller fish to fill the evolution bar, and avoid larger predators.
+4. Clear the stage to advance. Each clear is saved to the server and updates your leaderboard position.
+5. Check the leaderboard for your rank, and use the share button to share it.
+6. Reach stage 5 or 10 to earn flair in the subreddit.
+
+## How moderators set it up
+
+1. Install the app from its app page and choose the subreddit. The app creates a game post automatically.
+2. To create another game post later, use the subreddit moderator menu item **Create a new post**.
+3. Turn on **user flair** in the subreddit's mod tools if you want players to receive the flair rewards. Without it, progress still saves, but flair cannot be set.
+4. Optionally review the app's terms and conditions in [TERMS.md](./TERMS.md).
+
+## Important operational notes
+
+- **Login required for ranking.** The leaderboard and flair rewards use the player's Reddit account. Logged-out players can play, but their progress is not ranked.
+- **Progress is verified on the server.** The game does not trust a stage number sent by the browser. Each stage clear adds one stage on the server, clears that arrive less than 10 seconds apart are rejected, and progress is capped at stage 10,000. A player's older local progress is not backfilled into the leaderboard, so returning players may see a lower leaderboard number than their in-game stage.
+- **Leaderboards are per subreddit.** Scores are stored per app installation, so each community has its own board.
+- **Flair replaces existing flair.** When the app awards flair, it replaces any flair the player already has in that subreddit. Players can change it again through Reddit at any time.
+- **Payments.** The support purchase is processed by Reddit. It is optional and does not unlock gameplay advantages.
+- **Notifications.** Push notifications are optional, and only sent to players who opt in. Sending notifications requires approval for Reddit's notifications beta.
+- **Data.** The app stores each player's stage, last clear time, and flair tier in Redis, plus a leaderboard of usernames and stages for the subreddit.
+
+## Tech stack
+
+- [Devvit](https://developers.reddit.com/) for the Reddit app runtime, Redis, and Reddit API access
+- [React](https://react.dev/) 19 + [Vite](https://vite.dev/) for the client
+- [Hono](https://hono.dev/) for server routes
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [TypeScript](https://www.typescriptlang.org/) for server and shared code
 
 ## How it works
 
@@ -40,18 +75,7 @@ Redis is scoped per app installation, so every subreddit gets its own board.
 - `progress:{username}` — hash with `stage`, `lastAt` (last accepted clear timestamp), and `flairStage` (highest flair tier awarded)
 - `support:count` — number of support purchases
 
-Because the server only counts clears made while logged in, a player's older local progress is not backfilled into the leaderboard.
-
-## Tech stack
-
-- [Devvit](https://developers.reddit.com/) 0.15 for the Reddit app runtime, Redis, and Reddit API access
-- [React](https://react.dev/) 19 + [Vite](https://vite.dev/) 8 for the client
-- [Hono](https://hono.dev/) for server routes
-- [Tailwind CSS](https://tailwindcss.com/) 4 for styling
-- [TypeScript](https://www.typescriptlang.org/) for server and shared code
-- [lucide-react](https://lucide.dev/) for icons
-
-## Getting started
+## Local development
 
 Requires **Node.js 24** (see `.nvmrc`).
 
@@ -95,9 +119,9 @@ npx devvit publish         # unlisted publish request
 npx devvit publish --public  # public listing (requires review)
 ```
 
-Apps that sell digital goods or create custom posts need review before they can be published publicly. Terms & Conditions must be linked in the app's developer settings before publishing.
+Apps that sell digital goods or create custom posts need review before they can be published publicly. Terms & conditions must be linked in the app's developer settings before publishing.
 
-## Notes and limitations
+## Limitations
 
 - Flair is set with `reddit.setUserFlair`, which replaces any flair the player already has in that subreddit.
 - Push notifications require approval for Reddit's notifications beta.
